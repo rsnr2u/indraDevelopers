@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { getData, addItem, updateItem } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ArrowLeft, Save } from 'lucide-react';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import { ImageUpload } from '../../components/ImageUpload';
@@ -129,7 +129,7 @@ export function PageForm() {
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="font-medium text-lg border-b pb-2">Basic Information</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="pageName">Page Name *</Label>
@@ -138,8 +138,8 @@ export function PageForm() {
                     value={formData.pageName}
                     onChange={(e) => {
                       const name = e.target.value;
-                      setFormData({ 
-                        ...formData, 
+                      setFormData({
+                        ...formData,
                         pageName: name,
                         slug: generateSlug(name)
                       });
@@ -206,7 +206,7 @@ export function PageForm() {
             {/* SEO Settings */}
             <div className="space-y-4">
               <h3 className="font-medium text-lg border-b pb-2">SEO Settings</h3>
-              
+
               <div>
                 <Label htmlFor="metaTitle">Meta Title</Label>
                 <Input
@@ -284,7 +284,7 @@ export function PageForm() {
                     Allow Search Engine Indexing
                   </Label>
                   <p className="text-xs text-slate-500 mt-1">
-                    {formData.seo?.index !== false 
+                    {formData.seo?.index !== false
                       ? 'This page will be indexed by search engines (robots meta tag: index, follow)'
                       : 'This page will NOT be indexed by search engines (robots meta tag: noindex, nofollow)'}
                   </p>

@@ -5,7 +5,7 @@ import { getData, setData, addItem, deleteItem } from '../../utils/localStorage'
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
@@ -19,25 +19,27 @@ export function Blog() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 
+  const loadData = async () => {
+    const categoriesData = await getData('blogCategories');
+    const postsData = await getData('blogPosts');
+    setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+    setPosts(Array.isArray(postsData) ? postsData : []);
+  };
+
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setCategories(getData('blogCategories') || []);
-    setPosts(getData('blogPosts') || []);
-  };
-
-  const handleSaveCategory = () => {
+  const handleSaveCategory = async () => {
     if (!formData.name) {
       toast.error('Please enter category name');
       return;
     }
 
     const slug = formData.name.toLowerCase().replace(/\s+/g, '-');
-    
+
     if (editingItem) {
-      const updated = categories.map(cat => 
+      const updated = categories.map(cat =>
         cat.id === editingItem.id ? { ...cat, name: formData.name, slug } : cat
       );
       setData('blogCategories', updated);
@@ -53,7 +55,7 @@ export function Blog() {
     setEditingItem(null);
   };
 
-  const handleSavePost = () => {
+  const handleSavePost = async () => {
     if (!formData.title || !formData.categoryId || !formData.content) {
       toast.error('Please fill in all required fields');
       return;
@@ -69,7 +71,7 @@ export function Blog() {
     };
 
     if (editingItem) {
-      const updated = posts.map(post => 
+      const updated = posts.map(post =>
         post.id === editingItem.id ? { ...post, ...postData } : post
       );
       setData('blogPosts', updated);
@@ -125,9 +127,8 @@ export function Blog() {
                         <p className="text-sm text-gray-600 mt-1">
                           {categories.find(c => c.id === post.categoryId)?.name || 'Uncategorized'} • {new Date(post.createdAt).toLocaleDateString()}
                         </p>
-                        <span className={`text-xs px-2 py-1 rounded inline-block mt-2 ${
-                          post.status === 'Published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>
+                        <span className={`text-xs px-2 py-1 rounded inline-block mt-2 ${post.status === 'Published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          }`}>
                           {post.status}
                         </span>
                       </div>

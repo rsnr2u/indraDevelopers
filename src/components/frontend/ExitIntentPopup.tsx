@@ -15,38 +15,43 @@ export function ExitIntentPopup() {
   const { colors } = useTheme();
 
   useEffect(() => {
-    const popupSettings = getData('exitIntentSettings');
-    if (popupSettings && popupSettings.enabled) {
-      setSettings(popupSettings);
-      
-      // Check if already shown in this session
-      const shownInSession = sessionStorage.getItem('exitIntentShown');
-      if (shownInSession) {
-        setHasShown(true);
-        return;
-      }
+    const loadSettings = async () => {
+      const popupSettings = await getData('exitIntentSettings');
+      if (popupSettings && !Array.isArray(popupSettings) && popupSettings.enabled) {
+        setSettings(popupSettings);
 
-      // Track mouse movement for exit intent
-      let exitIntentTriggered = false;
-      const handleMouseLeave = (e: MouseEvent) => {
-        if (e.clientY <= 0 && !exitIntentTriggered && !hasShown) {
-          exitIntentTriggered = true;
-          setTimeout(() => {
-            setIsVisible(true);
-            setHasShown(true);
-            sessionStorage.setItem('exitIntentShown', 'true');
-          }, 200);
+        // Check if already shown in this session
+        const shownInSession = sessionStorage.getItem('exitIntentShown');
+        if (shownInSession) {
+          setHasShown(true);
+          return;
         }
-      };
 
-      document.addEventListener('mouseleave', handleMouseLeave);
-      return () => document.removeEventListener('mouseleave', handleMouseLeave);
-    }
+        // Track mouse movement for exit intent
+        let exitIntentTriggered = false;
+        const handleMouseLeave = (e: MouseEvent) => {
+          if (e.clientY <= 0 && !exitIntentTriggered && !hasShown) {
+            exitIntentTriggered = true;
+            setTimeout(() => {
+              setIsVisible(true);
+              setHasShown(true);
+              sessionStorage.setItem('exitIntentShown', 'true');
+            }, 200);
+          }
+        };
+
+        document.addEventListener('mouseleave', handleMouseLeave);
+        // Clean up the event listener inside the effect cleanup
+        return () => document.removeEventListener('mouseleave', handleMouseLeave);
+      }
+    };
+
+    loadSettings();
   }, [hasShown]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.phone) {
       toast.error('Please fill in required fields');
       return;
@@ -59,14 +64,19 @@ export function ExitIntentPopup() {
       createdAt: new Date().toISOString()
     };
 
-    addItem('leads', leadData);
+    await addItem('leads', leadData);
     toast.success('Thank you! We will contact you soon.');
     setIsVisible(false);
 
     // Redirect to WhatsApp if enabled
     if (settings.redirectToWhatsApp) {
-      const websiteSettings = getData('settings');
-      const whatsappNumber = websiteSettings?.contact?.phone?.replace(/[^0-9]/g, '') || '';
+      const websiteSettings = await getData('settings');
+      // Handle potential array response or null
+      let whatsappNumber = '';
+      if (websiteSettings && !Array.isArray(websiteSettings)) {
+        whatsappNumber = websiteSettings.contact?.phone?.replace(/[^0-9]/g, '') || '';
+      }
+
       if (whatsappNumber) {
         const message = `Hi, I'm interested in your projects. My name is ${formData.name}. Please share more details.`;
         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -82,9 +92,9 @@ export function ExitIntentPopup() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-in fade-in duration-300">
       <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div 
+        <div
           className="p-6 rounded-t-xl text-white relative overflow-hidden"
-          style={{ 
+          style={{
             background: `linear-gradient(135deg, ${colors.primaryColor} 0%, ${colors.secondaryColor} 100%)`
           }}
         >
@@ -94,7 +104,7 @@ export function ExitIntentPopup() {
           >
             <X className="h-5 w-5" />
           </button>
-          
+
           <div className="relative z-10">
             <h2 className="text-2xl mb-2">{settings.title || "Wait! Don't Miss Out"}</h2>
             <p className="text-white/90 text-sm">
@@ -140,8 +150,8 @@ export function ExitIntentPopup() {
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full text-white"
               style={{ backgroundColor: colors.primaryColor }}
             >

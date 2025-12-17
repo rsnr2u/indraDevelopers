@@ -5,7 +5,7 @@ import { getData, setData, addItem } from '../../utils/localStorage';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageUpload } from '../../components/ImageUpload';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -28,18 +28,22 @@ export function BlogPostForm() {
   });
 
   useEffect(() => {
-    setCategories(getData('blogCategories') || []);
+    const loadPost = async () => {
+      const categoriesData = await getData('blogCategories') || [];
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
 
-    if (id) {
-      const posts = getData('blogPosts') || [];
-      const post = posts.find((p: any) => p.id === id);
-      if (post) {
-        setFormData(post);
+      if (id) {
+        const posts = await getData('blogPosts') || [];
+        const post = Array.isArray(posts) ? posts.find((p: any) => p.id === id) : null;
+        if (post) {
+          setFormData(post);
+        }
       }
-    }
+    };
+    loadPost();
   }, [id]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.categoryId || !formData.content) {
       toast.error('Please fill in all required fields');
       return;
@@ -56,8 +60,8 @@ export function BlogPostForm() {
 
     try {
       if (id) {
-        const posts = getData('blogPosts') || [];
-        const updated = posts.map((post: any) => 
+        const posts = await getData('blogPosts') || [];
+        const updated = (Array.isArray(posts) ? posts : []).map((post: any) =>
           post.id === id ? { ...post, ...postData } : post
         );
         setData('blogPosts', updated);

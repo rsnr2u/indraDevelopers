@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageUpload } from '../../components/ImageUpload';
 
 export function SEO() {
@@ -23,10 +23,13 @@ export function SEO() {
   });
 
   useEffect(() => {
-    const settings = getData('seoSettings');
-    if (settings) {
-      setSeoSettings(settings);
-    }
+    const loadSettings = async () => {
+      const settings = await getData('seoSettings');
+      if (settings) {
+        setSeoSettings(settings);
+      }
+    };
+    loadSettings();
   }, []);
 
   const handleSave = () => {
@@ -67,11 +70,10 @@ export function SEO() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                    activeSection === section.id
-                      ? 'bg-blue-600 text-white'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${activeSection === section.id
+                    ? 'bg-blue-600 text-white'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   {section.label}
                 </button>
@@ -142,7 +144,7 @@ export function SEO() {
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={seoSettings.analytics?.enableTracking || false}
-                      onCheckedChange={(checked) => updateSection('analytics', 'enableTracking', checked)}
+                      onCheckedChange={(checked: boolean) => updateSection('analytics', 'enableTracking', checked)}
                     />
                     <Label>Enable Tracking</Label>
                   </div>
@@ -189,7 +191,7 @@ export function SEO() {
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={seoSettings.sitemap?.enabled || false}
-                      onCheckedChange={(checked) => updateSection('sitemap', 'enabled', checked)}
+                      onCheckedChange={(checked: boolean) => updateSection('sitemap', 'enabled', checked)}
                     />
                     <Label>Enable Sitemap</Label>
                   </div>
@@ -266,14 +268,14 @@ export function SEO() {
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={seoSettings.indexing?.allowIndexing || false}
-                      onCheckedChange={(checked) => updateSection('indexing', 'allowIndexing', checked)}
+                      onCheckedChange={(checked: boolean) => updateSection('indexing', 'allowIndexing', checked)}
                     />
                     <Label>Allow Search Engine Indexing</Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={seoSettings.indexing?.noFollow || false}
-                      onCheckedChange={(checked) => updateSection('indexing', 'noFollow', checked)}
+                      onCheckedChange={(checked: boolean) => updateSection('indexing', 'noFollow', checked)}
                     />
                     <Label>No Follow</Label>
                   </div>

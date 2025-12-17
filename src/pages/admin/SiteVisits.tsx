@@ -8,7 +8,7 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 import { getData, updateItem, deleteItem, addItem } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Calendar, Clock, MapPin, User, Phone, Mail, Edit, Trash2, Plus, Check, X } from 'lucide-react';
 
 interface SiteVisit {
@@ -49,15 +49,25 @@ export function SiteVisits() {
     assignedTo: ''
   });
 
+  const loadData = async () => {
+    try {
+      const visitsData = await getData('siteVisits');
+      setVisits(Array.isArray(visitsData) ? visitsData : []);
+
+      const projectsData = await getData('projects');
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
+
+      const leadsData = await getData('leads');
+      setLeads(Array.isArray(leadsData) ? leadsData : []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load data');
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, []);
-
-  const loadData = () => {
-    setVisits(getData('siteVisits') || []);
-    setProjects(getData('projects') || []);
-    setLeads(getData('leads') || []);
-  };
 
   const handleSave = () => {
     if (!formData.customerName || !formData.customerPhone || !formData.projectId || !formData.visitDate) {
@@ -136,7 +146,7 @@ export function SiteVisits() {
 
   const filteredVisits = visits.filter(visit => {
     const matchesStatus = filterStatus === 'all' || visit.status === filterStatus;
-    const matchesSearch = 
+    const matchesSearch =
       (visit.customerName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
       (visit.customerPhone || '').includes(searchTerm);
     return matchesStatus && matchesSearch;
@@ -236,7 +246,7 @@ export function SiteVisits() {
                         {visit.status}
                       </span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-600">
                       <div className="flex items-center gap-2">
                         <Phone className="h-4 w-4" />

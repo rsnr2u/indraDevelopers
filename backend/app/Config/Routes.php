@@ -35,14 +35,45 @@ $routes->group('api', ['namespace' => 'App\\Controllers\\Api'], function ($route
     $routes->get('cmsPages', 'Settings::show/cmsPages');
     $routes->put('settings/cmsPages', 'Settings::update/cmsPages');
 
+    // General Settings
+    $routes->get('settings', 'Settings::show/settings');
+    $routes->put('settings/settings', 'Settings::update/settings');
+
     $routes->get('seoSettings', 'Settings::show/seoSettings');
     $routes->put('settings/seoSettings', 'Settings::update/seoSettings');
 
-    $routes->get('galleries', 'Settings::show/gallery'); // Mapped to gallery key in settings? 
-    // Wait, initialSeeder had 'cmsPages' with 'gallery' key inside it?
-    // Let's check seeder. No, Galleries usually distinct.
-    // Seeder had 'cmsPages' -> 'gallery'. So 'galleries' might not exist as a table?
-    // Step 219 (localStorage.ts) has getData('galleries').
+    $routes->get('exitIntentSettings', 'Settings::show/exitIntentSettings');
+    $routes->put('settings/exitIntentSettings', 'Settings::update/exitIntentSettings');
+
+    $routes->get('cmsPages', 'Settings::show/cmsPages');
+    $routes->put('settings/cmsPages', 'Settings::update/cmsPages');
+
+    $routes->get('menus', 'Settings::show/menus');
+    $routes->put('settings/menus', 'Settings::update/menus');
+
+    $routes->get('whatsappWidgetSettings', 'Settings::show/whatsappWidgetSettings');
+    $routes->put('settings/whatsappWidgetSettings', 'Settings::update/whatsappWidgetSettings');
+
+    $routes->get('galleries', 'Settings::show/galleries'); // Updated mapping
+    $routes->put('settings/galleries', 'Settings::update/galleries');
+
+    $routes->get('emailTemplates', 'Settings::show/emailTemplates');
+    $routes->put('settings/emailTemplates', 'Settings::update/emailTemplates');
+
+    $routes->get('analytics', 'Settings::show/analytics');
+    // Analytics might be read-only or updated via background processes, but allowing update for now if it stores cached data
+    $routes->put('settings/analytics', 'Settings::update/analytics');
+
+    $routes->get('customPages', 'Settings::show/customPages');
+    $routes->put('settings/customPages', 'Settings::update/customPages');
+
+    // Site Visits - Needs a Controller, but can be a setting for now if simple, 
+    // BUT SiteVisits.tsx uses structured data (CRUD). 
+    // It calls `getData('siteVisits')` -> GET api/siteVisits
+    // It calls `addItem('siteVisits', ...)` -> POST api/siteVisits
+    // It calls `updateItem('siteVisits', ...)` -> PUT api/siteVisits/id
+    // So it MUST be a Resource Controller, not a Setting.
+    $routes->resource('siteVisits');
     // In Gallery.tsx: getData('galleries').
     // I need to see if 'galleries' is a table or a setting.
     // In InitialSeeder: NO 'galleries' table seeded.

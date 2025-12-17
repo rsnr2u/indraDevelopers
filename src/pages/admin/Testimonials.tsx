@@ -7,7 +7,7 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 import { getData, addItem, updateItem, deleteItem } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Star, Quote, Video } from 'lucide-react';
 import { ImageUpload } from '../../components/ImageUpload';
 
@@ -46,14 +46,22 @@ export function Testimonials() {
     status: 'Active'
   });
 
+  const loadData = async () => {
+    try {
+      const testimonialsData = await getData('testimonials');
+      setTestimonials(Array.isArray(testimonialsData) ? testimonialsData : []);
+
+      const projectsData = await getData('projects');
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load data');
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, []);
-
-  const loadData = () => {
-    setTestimonials(getData('testimonials') || []);
-    setProjects(getData('projects') || []);
-  };
 
   const handleSave = () => {
     if (!formData.name || !formData.testimonial) {
@@ -230,11 +238,10 @@ export function Testimonials() {
                       {project.name}
                     </span>
                   )}
-                  <span className={`px-2 py-1 text-xs rounded ${
-                    testimonial.status === 'Active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-slate-100 text-slate-800'
-                  }`}>
+                  <span className={`px-2 py-1 text-xs rounded ${testimonial.status === 'Active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-slate-100 text-slate-800'
+                    }`}>
                     {testimonial.status}
                   </span>
                 </div>
@@ -321,7 +328,7 @@ export function Testimonials() {
                 <Label>Customer Photo</Label>
                 <ImageUpload
                   value={formData.image || ''}
-                  onChange={(value) => setFormData({ ...formData, image: value })}
+                  onChange={(value) => setFormData({ ...formData, image: value as string })}
                 />
               </div>
 
@@ -335,11 +342,10 @@ export function Testimonials() {
                       onClick={() => setFormData({ ...formData, rating: star })}
                     >
                       <Star
-                        className={`h-6 w-6 cursor-pointer ${
-                          star <= (formData.rating || 0)
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-slate-300'
-                        }`}
+                        className={`h-6 w-6 cursor-pointer ${star <= (formData.rating || 0)
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-slate-300'
+                          }`}
                       />
                     </button>
                   ))}

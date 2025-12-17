@@ -24,16 +24,6 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  useEffect(() => {
-    if (banners.length <= 1) return;
-    
-    const timer = setInterval(() => {
-      goToNext();
-    }, autoPlayInterval);
-
-    return () => clearInterval(timer);
-  }, [currentIndex, autoPlayInterval, banners.length]);
-
   const goToNext = () => {
     if (isTransitioning || banners.length <= 1) return;
     setIsTransitioning(true);
@@ -55,6 +45,16 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const timer = setInterval(() => {
+      goToNext();
+    }, autoPlayInterval);
+
+    return () => clearInterval(timer);
+  }, [currentIndex, autoPlayInterval, banners.length]);
+
   if (banners.length === 0) return null;
 
   return (
@@ -64,9 +64,8 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
         {banners.map((banner, index) => (
           <div
             key={banner.id || index}
-            className={`transition-opacity duration-500 ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0 absolute inset-0'
-            }`}
+            className={`transition-opacity duration-500 ${index === currentIndex ? 'opacity-100' : 'opacity-0 absolute inset-0'
+              }`}
           >
             <div className="relative h-[600px] md:h-[700px]">
               {banner.image ? (
@@ -76,7 +75,7 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div 
+                <div
                   className="w-full h-full"
                   style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.secondaryColor})` }}
                 />
@@ -102,12 +101,12 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
                     {banner.buttonText && banner.buttonLink && (
                       <div className="flex flex-wrap gap-4">
                         <Link to={banner.buttonLink}>
-                          <Button 
-                            size="lg" 
+                          <Button
+                            size="lg"
                             className="text-white shadow-2xl px-8 py-6 h-auto"
                             style={{ backgroundColor: colors.primaryColor }}
-                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.opacity = '0.9'}
+                            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.opacity = '1'}
                           >
                             {banner.buttonText}
                           </Button>
@@ -151,11 +150,10 @@ export function BannerCarousel({ banners, autoPlayInterval = 5000 }: BannerCarou
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentIndex
-                    ? 'bg-white w-8'
-                    : 'bg-white/50 w-2 hover:bg-white/70'
-                }`}
+                className={`h-2 rounded-full transition-all ${index === currentIndex
+                  ? 'bg-white w-8'
+                  : 'bg-white/50 w-2 hover:bg-white/70'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

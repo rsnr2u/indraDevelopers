@@ -8,7 +8,7 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 import { getData, addItem, updateItem, deleteItem } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Plus, Edit, Trash2, FileText, Eye } from 'lucide-react';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import { ImageUpload } from '../../components/ImageUpload';
@@ -49,13 +49,14 @@ export function Pages() {
     status: 'Draft'
   });
 
+  const loadPages = async () => {
+    const pagesData = await getData('customPages');
+    setPages(Array.isArray(pagesData) ? pagesData : []);
+  };
+
   useEffect(() => {
     loadPages();
   }, []);
-
-  const loadPages = () => {
-    setPages(getData('customPages') || []);
-  };
 
   const generateSlug = (pageName: string) => {
     return pageName
@@ -147,23 +148,22 @@ export function Pages() {
                   <div className="flex items-center gap-3 mb-2">
                     <FileText className="h-5 w-5 text-blue-600" />
                     <h3 className="text-xl">{page.pageTitle}</h3>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      page.status === 'Published' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-xs ${page.status === 'Published'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {page.status}
                     </span>
                   </div>
-                  
+
                   <p className="text-sm text-slate-600 mb-2">{page.pageName}</p>
-                  
+
                   <div className="text-sm text-slate-500">
                     <span>Slug: /{page.slug}</span>
                   </div>
-                  
+
                   {page.description && (
-                    <div 
+                    <div
                       className="mt-3 text-sm text-slate-700 line-clamp-2"
                       dangerouslySetInnerHTML={{ __html: page.description.substring(0, 200) + '...' }}
                     />
@@ -233,7 +233,7 @@ export function Pages() {
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="font-medium text-lg border-b pb-2">Basic Information</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="pageName">Page Name *</Label>
@@ -242,8 +242,8 @@ export function Pages() {
                       value={formData.pageName}
                       onChange={(e) => {
                         const name = e.target.value;
-                        setFormData({ 
-                          ...formData, 
+                        setFormData({
+                          ...formData,
                           pageName: name,
                           slug: generateSlug(name)
                         });
@@ -310,7 +310,7 @@ export function Pages() {
               {/* SEO Settings */}
               <div className="space-y-4">
                 <h3 className="font-medium text-lg border-b pb-2">SEO Settings</h3>
-                
+
                 <div>
                   <Label htmlFor="metaTitle">Meta Title</Label>
                   <Input
@@ -366,7 +366,7 @@ export function Pages() {
                     value={formData.seo?.ogImage || ''}
                     onChange={(value) => setFormData({
                       ...formData,
-                      seo: { ...formData.seo!, ogImage: value }
+                      seo: { ...formData.seo!, ogImage: value as string }
                     })}
                   />
                 </div>

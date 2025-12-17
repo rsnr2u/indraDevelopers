@@ -14,12 +14,18 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const loadSettings = () => {
-      const websiteSettings = getData('settings');
-      setSettings(websiteSettings);
-      
-      const menuData = getData('menus');
-      setMenus(menuData?.header || []);
+    const loadSettings = async () => {
+      const websiteSettings = await getData('settings');
+      if (websiteSettings && !Array.isArray(websiteSettings)) {
+        // Handle potential nested 'settings' key
+        const actualSettings = websiteSettings.settings || websiteSettings;
+        setSettings(actualSettings);
+      }
+
+      const menuData = await getData('menus');
+      if (menuData && !Array.isArray(menuData)) {
+        setMenus(menuData.header || []);
+      }
     };
 
     loadSettings();
@@ -58,8 +64,8 @@ export function Header() {
           <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-2 text-sm">
             <div className="flex flex-wrap items-center gap-6">
               {settings.contact?.phone && (
-                <a 
-                  href={`tel:${settings.contact.phone}`} 
+                <a
+                  href={`tel:${settings.contact.phone}`}
                   className="flex items-center gap-2 transition-colors"
                   style={{ color: 'white' }}
                   onMouseEnter={(e) => e.currentTarget.style.color = primaryColor}
@@ -70,8 +76,8 @@ export function Header() {
                 </a>
               )}
               {settings.contact?.email && (
-                <a 
-                  href={`mailto:${settings.contact.email}`} 
+                <a
+                  href={`mailto:${settings.contact.email}`}
                   className="flex items-center gap-2 transition-colors"
                   style={{ color: 'white' }}
                   onMouseEnter={(e) => e.currentTarget.style.color = primaryColor}
@@ -83,13 +89,13 @@ export function Header() {
               )}
             </div>
             <Link to="/admin/login">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="h-7 text-xs text-white hover:bg-slate-800"
                 style={{ '--hover-color': primaryColor } as any}
-                onMouseEnter={(e) => e.currentTarget.style.color = primaryColor}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.color = primaryColor}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.color = 'white'}
               >
                 Admin Portal
               </Button>
@@ -106,19 +112,19 @@ export function Header() {
             <Link to="/" className="flex items-center gap-3 group">
               {settings.website.headerLogo ? (
                 // If logo exists, show only logo image
-                <img 
-                  src={settings.website.headerLogo} 
-                  alt={settings.website.name} 
-                  className="h-12 transition-transform group-hover:scale-105" 
+                <img
+                  src={settings.website.headerLogo}
+                  alt={settings.website.name}
+                  className="h-12 transition-transform group-hover:scale-105"
                 />
               ) : (
                 // If no logo, show text and slogan
                 <div>
-                  <h1 
+                  <h1
                     className="text-2xl text-slate-900 transition-colors"
                     style={{ '--hover-color': primaryColor } as any}
-                    onMouseEnter={(e) => e.currentTarget.style.color = primaryColor}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#0f172a'}
+                    onMouseEnter={(e: React.MouseEvent<HTMLHeadingElement>) => e.currentTarget.style.color = primaryColor}
+                    onMouseLeave={(e: React.MouseEvent<HTMLHeadingElement>) => e.currentTarget.style.color = '#0f172a'}
                   >
                     {settings.website.name}
                   </h1>
@@ -137,18 +143,18 @@ export function Header() {
                   to={menu.url}
                   className="px-3 py-2 transition-colors text-slate-700"
                   style={isActive(menu.url) ? { color: primaryColor } : {}}
-                  onMouseEnter={(e) => !isActive(menu.url) && (e.currentTarget.style.color = primaryColor)}
-                  onMouseLeave={(e) => !isActive(menu.url) && (e.currentTarget.style.color = '#334155')}
+                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => !isActive(menu.url) && (e.currentTarget.style.color = primaryColor)}
+                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => !isActive(menu.url) && (e.currentTarget.style.color = '#334155')}
                 >
                   {menu.label}
                 </Link>
               ))}
               <Link to="/contact" className="ml-2">
-                <Button 
+                <Button
                   className="text-white shadow-md"
                   style={{ backgroundColor: primaryColor }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.opacity = '0.9'}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.opacity = '1'}
                 >
                   Get Quote
                 </Button>
@@ -173,18 +179,17 @@ export function Header() {
                     key={menu.id}
                     to={menu.url}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-4 py-3 rounded-lg transition-colors ${
-                      isActive(menu.url)
-                        ? 'text-white'
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
+                    className={`px-4 py-3 rounded-lg transition-colors ${isActive(menu.url)
+                      ? 'text-white'
+                      : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                     style={isActive(menu.url) ? { backgroundColor: primaryColor } : {}}
                   >
                     {menu.label}
                   </Link>
                 ))}
                 <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
-                  <Button 
+                  <Button
                     className="w-full text-white"
                     style={{ backgroundColor: primaryColor }}
                   >

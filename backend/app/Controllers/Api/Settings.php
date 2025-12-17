@@ -27,7 +27,8 @@ class Settings extends ResourceController
         $setting = $db->table('settings')->where('key', $key)->get()->getRowArray();
 
         if (!$setting) {
-            return $this->failNotFound('Setting not found');
+            // Return empty object for virtual settings to allow frontend to initialize
+            return $this->respond([]);
         }
 
         return $this->respond(json_decode($setting['value'], true));
@@ -48,7 +49,14 @@ class Settings extends ResourceController
             ]);
             return $this->respond(['message' => 'Settings updated', 'key' => $key]);
         } else {
-            return $this->failNotFound('Setting key not found');
+            // Create new setting
+            $db->table('settings')->insert([
+                'key' => $key,
+                'value' => json_encode($data),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            return $this->respondCreated(['message' => 'Settings created', 'key' => $key]);
         }
     }
 }

@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageUpload } from '../../components/ImageUpload';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
@@ -19,38 +19,41 @@ export function CMS() {
   });
 
   useEffect(() => {
-    const pages = getData('cmsPages');
-    if (pages) {
-      setCmsPages({
-        home: {
-          banners: pages.home?.banners || [],
-          stats: pages.home?.stats || [
-            { id: '1', label: 'Active Projects', value: '3+', icon: 'building' },
-            { id: '2', label: 'Happy Clients', value: '500+', icon: 'users' },
-            { id: '3', label: 'Years Experience', value: '15+', icon: 'calendar' },
-            { id: '4', label: 'Success Rate', value: '95%', icon: 'trophy' }
-          ],
-          ...pages.home
-        },
-        about: pages.about || {},
-        contact: pages.contact || {}
-      });
-    } else {
-      // Initialize with default values if no data exists
-      setCmsPages({
-        home: {
-          banners: [],
-          stats: [
-            { id: '1', label: 'Active Projects', value: '3+', icon: 'building' },
-            { id: '2', label: 'Happy Clients', value: '500+', icon: 'users' },
-            { id: '3', label: 'Years Experience', value: '15+', icon: 'calendar' },
-            { id: '4', label: 'Success Rate', value: '95%', icon: 'trophy' }
-          ]
-        },
-        about: {},
-        contact: {}
-      });
-    }
+    const loadPages = async () => {
+      const pages = await getData('cmsPages');
+      if (pages) {
+        setCmsPages({
+          home: {
+            banners: pages.home?.banners || [],
+            stats: pages.home?.stats || [
+              { id: '1', label: 'Active Projects', value: '3+', icon: 'building' },
+              { id: '2', label: 'Happy Clients', value: '500+', icon: 'users' },
+              { id: '3', label: 'Years Experience', value: '15+', icon: 'calendar' },
+              { id: '4', label: 'Success Rate', value: '95%', icon: 'trophy' }
+            ],
+            ...pages.home
+          },
+          about: pages.about || {},
+          contact: pages.contact || {}
+        });
+      } else {
+        // Initialize with default values if no data exists
+        setCmsPages({
+          home: {
+            banners: [],
+            stats: [
+              { id: '1', label: 'Active Projects', value: '3+', icon: 'building' },
+              { id: '2', label: 'Happy Clients', value: '500+', icon: 'users' },
+              { id: '3', label: 'Years Experience', value: '15+', icon: 'calendar' },
+              { id: '4', label: 'Success Rate', value: '95%', icon: 'trophy' }
+            ]
+          },
+          about: {},
+          contact: {}
+        });
+      }
+    };
+    loadPages();
   }, []);
 
   const handleSave = () => {
@@ -86,11 +89,10 @@ export function CMS() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                    activeSection === section.id
-                      ? 'bg-blue-600 text-white'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${activeSection === section.id
+                    ? 'bg-blue-600 text-white'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   {section.label}
                 </button>
@@ -103,7 +105,7 @@ export function CMS() {
               {activeSection === 'home' && (
                 <div className="space-y-6">
                   <h2 className="text-xl mb-3">Home Page Content</h2>
-                  
+
                   {/* Banner Carousel Section */}
                   <div className="border rounded-lg p-4 bg-gray-50">
                     <div className="flex justify-between items-center mb-4">

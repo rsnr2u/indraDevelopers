@@ -3,20 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getData, setData, addItem, deleteItem } from '../../utils/localStorage';
 import { Button } from '../../components/ui/button';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Plus, Eye, Pencil, Trash2, Shield, ArrowLeft } from 'lucide-react';
 
 export function RoleManagement() {
   const navigate = useNavigate();
   const [roles, setRoles] = useState<any[]>([]);
 
+  const loadData = async () => {
+    const rolesData = await getData('roles');
+    setRoles(Array.isArray(rolesData) ? rolesData : []);
+  };
+
   useEffect(() => {
     loadData();
   }, []);
-
-  const loadData = () => {
-    setRoles(getData('roles') || []);
-  };
 
   const handleDelete = (id: string) => {
     if (!confirm('Are you sure you want to delete this role?')) return;
@@ -40,16 +41,16 @@ export function RoleManagement() {
 
   const getPermissionLabel = (role: any, moduleId: string) => {
     if (role.permissions?.includes('all')) return 'Full Access';
-    
+
     const modulePerms = role.modulePermissions?.[moduleId];
     if (!modulePerms) return 'No Access';
-    
+
     const perms = [];
     if (modulePerms.view) perms.push('View');
     if (modulePerms.create) perms.push('Create');
     if (modulePerms.edit) perms.push('Edit');
     if (modulePerms.delete) perms.push('Delete');
-    
+
     return perms.length > 0 ? perms.join(', ') : 'No Access';
   };
 
@@ -85,8 +86,8 @@ export function RoleManagement() {
                     <div>
                       <h3 className="text-xl">{role.name}</h3>
                       <p className="text-sm text-gray-600">
-                        {role.permissions?.includes('all') 
-                          ? 'All Permissions' 
+                        {role.permissions?.includes('all')
+                          ? 'All Permissions'
                           : `Custom Permissions`}
                       </p>
                     </div>

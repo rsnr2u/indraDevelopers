@@ -32,22 +32,25 @@ export function Home() {
     const fetchHomeData = async () => {
       try {
         const cmsPages = await getData('cmsPages');
-        setHomeData(cmsPages?.home);
+        // Handle if cmsPages is [] or null
+        const homeContent = (cmsPages && !Array.isArray(cmsPages)) ? cmsPages.home : {};
+        setHomeData(homeContent);
 
         const projectsData = await getData('projects');
         const activeProjects = (projectsData || []).filter((p: any) => p.status === 'Active').slice(0, 6);
         setProjects(activeProjects);
       } catch (error) {
         console.error('Error loading home data:', error);
+        setHomeData({}); // Fallback to empty object to allow rendering
       }
     };
     fetchHomeData();
   }, []);
 
-  if (!homeData) return null;
+  // if (!homeData) return null; // Removed to allow rendering with defaults
 
-  const banners = homeData.banners || [];
-  const stats = homeData.stats || [];
+  const banners = homeData?.banners || [];
+  const stats = homeData?.stats || [];
 
   const sliderSettings = {
     dots: true,

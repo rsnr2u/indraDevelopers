@@ -9,12 +9,17 @@ export function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
 
   useEffect(() => {
-    const allTestimonials = getData('testimonials') || [];
-    // Get only active and featured testimonials
-    const activeTestimonials = allTestimonials.filter(
-      (t: any) => t.status === 'Active' && t.featured
-    );
-    setTestimonials(activeTestimonials);
+    const loadTestimonials = async () => {
+      const allTestimonials = await getData('testimonials') || [];
+      if (Array.isArray(allTestimonials)) {
+        // Get only active and featured testimonials
+        const activeTestimonials = allTestimonials.filter(
+          (t: any) => t.status === 'Active' && t.featured
+        );
+        setTestimonials(activeTestimonials);
+      }
+    };
+    loadTestimonials();
   }, []);
 
   if (testimonials.length === 0) {
@@ -52,7 +57,7 @@ export function TestimonialsSection() {
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
-              <div 
+              <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-white"
                 style={{ backgroundColor: colors.primaryColor }}
               >

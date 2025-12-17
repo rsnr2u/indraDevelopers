@@ -8,7 +8,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Switch } from '../../components/ui/switch';
 import { getData, setData } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Mail, MessageSquare, Save, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 
@@ -253,7 +253,7 @@ export function EmailTemplates() {
                 Preview of email and SMS template content
               </DialogDescription>
             </DialogHeader>
-            
+
             {previewTemplate && (
               <div className="space-y-4">
                 <div>

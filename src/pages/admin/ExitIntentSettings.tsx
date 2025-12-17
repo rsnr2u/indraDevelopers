@@ -7,7 +7,7 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { getData, setData } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { AlertTriangle, Save } from 'lucide-react';
 
 export function ExitIntentSettings() {
@@ -22,10 +22,13 @@ export function ExitIntentSettings() {
   });
 
   useEffect(() => {
-    const savedSettings = getData('exitIntentSettings');
-    if (savedSettings) {
-      setSettings(savedSettings);
-    }
+    const loadSettings = async () => {
+      const savedSettings = await getData('exitIntentSettings');
+      if (savedSettings && !Array.isArray(savedSettings)) {
+        setSettings(savedSettings);
+      }
+    };
+    loadSettings();
   }, []);
 
   const handleSave = () => {
@@ -52,7 +55,7 @@ export function ExitIntentSettings() {
             <AlertTriangle className="h-5 w-5" />
             Popup Configuration
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>

@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card } from '../../components/ui/card';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { User, Lock, Mail, Shield, Save, KeyRound } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 
@@ -30,7 +30,7 @@ export function Profile() {
       navigate('/admin/login');
       return;
     }
-    
+
     const user = JSON.parse(userStr);
     setCurrentUser(user);
     setProfileData({
@@ -40,14 +40,14 @@ export function Profile() {
     });
   }, [navigate]);
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if (!profileData.name || !profileData.email) {
       toast.error('Name and email are required');
       return;
     }
 
     try {
-      const users = getData('users') || [];
+      const users = await getData('users') || [];
       const updatedUsers = users.map((user: any) => {
         if (user.id === currentUser.id) {
           return {
@@ -76,7 +76,7 @@ export function Profile() {
     }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       toast.error('All password fields are required');
       return;
@@ -98,7 +98,7 @@ export function Profile() {
     }
 
     try {
-      const users = getData('users') || [];
+      const users = await getData('users') || [];
       const updatedUsers = users.map((user: any) => {
         if (user.id === currentUser.id) {
           return {

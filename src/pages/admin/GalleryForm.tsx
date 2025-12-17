@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageUpload } from '../../components/ImageUpload';
 import { X, Plus, ArrowLeft } from 'lucide-react';
 
@@ -23,17 +23,20 @@ export function GalleryForm() {
   const [newImage, setNewImage] = useState('');
 
   useEffect(() => {
-    if (isEdit) {
-      const galleries = getData('galleries') || [];
-      const gallery = galleries.find((g: any) => g.id === id);
-      if (gallery) {
-        setFormData({
-          title: gallery.title,
-          description: gallery.description,
-          images: gallery.images || []
-        });
+    const loadGallery = async () => {
+      if (isEdit) {
+        const galleries = await getData('galleries') || [];
+        const gallery = Array.isArray(galleries) ? galleries.find((g: any) => g.id === id) : null;
+        if (gallery) {
+          setFormData({
+            title: gallery.title,
+            description: gallery.description,
+            images: gallery.images || []
+          });
+        }
       }
-    }
+    };
+    loadGallery();
   }, [id, isEdit]);
 
   const addImageToGallery = () => {
@@ -59,7 +62,7 @@ export function GalleryForm() {
     toast.success('Image removed');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title.trim()) {
       toast.error('Please enter a title');
       return;
@@ -72,8 +75,8 @@ export function GalleryForm() {
 
     if (isEdit) {
       // Update existing gallery
-      const allGalleries = getData('galleries') || [];
-      const updated = allGalleries.map((g: any) =>
+      const allGalleries = await getData('galleries') || [];
+      const updated = (Array.isArray(allGalleries) ? allGalleries : []).map((g: any) =>
         g.id === id ? { ...g, ...formData } : g
       );
       setData('galleries', updated);
@@ -149,7 +152,7 @@ export function GalleryForm() {
                   <ImageUpload
                     label=""
                     value={newImage}
-                    onChange={setNewImage}
+                    onChange={(val) => setNewImage(val as string)}
                   />
                 </div>
                 <Button type="button" onClick={addImageToGallery} className="mt-auto">

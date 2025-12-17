@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageUpload } from '../../components/ImageUpload';
 import { Switch } from '../../components/ui/switch';
 import { Plus, Trash2 } from 'lucide-react';
@@ -15,17 +15,22 @@ export function Settings() {
   const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
-    const data = getData('settings');
-    // Initialize contact field if it doesn't exist
-    if (data && !data.contact) {
-      data.contact = {
-        phone: '+91 1234567890',
-        email: 'info@indradevelopers.com',
-        address: '123 Main Street, City, State - 500001'
-      };
-      setData('settings', data);
-    }
-    setSettings(data);
+    const loadSettings = async () => {
+      const data = await getData('settings');
+      if (data) {
+        const actualSettings = data.settings || data;
+        // Initialize contact field if it doesn't exist
+        if (!actualSettings.contact) {
+          actualSettings.contact = {
+            phone: '+91 1234567890',
+            email: 'info@indradevelopers.com',
+            address: '123 Main Street, City, State - 500001'
+          };
+        }
+        setSettings(actualSettings);
+      }
+    };
+    loadSettings();
   }, []);
 
   const handleSave = () => {
@@ -70,11 +75,10 @@ export function Settings() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full text-left px-4 py-2 rounded transition-colors ${
-                    activeSection === section.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded transition-colors ${activeSection === section.id
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:bg-gray-50'
+                    }`}
                 >
                   {section.label}
                 </button>
@@ -288,7 +292,7 @@ export function Settings() {
                       </div>
                       <Switch
                         checked={settings.security.enableSSL}
-                        onCheckedChange={(checked) => updateSection('security', 'enableSSL', checked)}
+                        onCheckedChange={(checked: boolean) => updateSection('security', 'enableSSL', checked)}
                       />
                     </div>
 
@@ -299,7 +303,7 @@ export function Settings() {
                       </div>
                       <Switch
                         checked={settings.security.enableCaptcha}
-                        onCheckedChange={(checked) => updateSection('security', 'enableCaptcha', checked)}
+                        onCheckedChange={(checked: boolean) => updateSection('security', 'enableCaptcha', checked)}
                       />
                     </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getData, deleteItem } from '../../utils/localStorage';
 import { Button } from '../../components/ui/button';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Plus, Trash2, Edit2, Image as ImageIcon } from 'lucide-react';
 
 export function GalleryManagement() {

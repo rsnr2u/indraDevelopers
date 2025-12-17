@@ -2,33 +2,36 @@ import { useEffect, useState } from 'react';
 import { getData, setData } from '../../utils/localStorage';
 import { sampleBlogPosts, sampleBlogCategories } from '../../utils/sampleData';
 import { Button } from '../ui/button';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Download } from 'lucide-react';
 
 export function InitializeSampleData() {
   const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    const blogPosts = getData('blogPosts') || [];
-    setHasData(blogPosts.length > 0);
+    const checkData = async () => {
+      const blogPosts = await getData('blogPosts') || [];
+      setHasData(blogPosts.length > 0);
+    };
+    checkData();
   }, []);
 
-  const loadSampleData = () => {
+  const loadSampleData = async () => {
     try {
       // Load sample categories if none exist
-      const existingCategories = getData('blogCategories') || [];
+      const existingCategories = await getData('blogCategories') || [];
       if (existingCategories.length === 0) {
-        setData('blogCategories', sampleBlogCategories);
+        await setData('blogCategories', sampleBlogCategories);
       }
 
       // Load sample blog posts
-      const existingPosts = getData('blogPosts') || [];
+      const existingPosts = await getData('blogPosts') || [];
       const newPosts = [...existingPosts, ...sampleBlogPosts];
-      setData('blogPosts', newPosts);
+      await setData('blogPosts', newPosts);
 
       toast.success('Sample blog posts loaded successfully!');
       setHasData(true);
-      
+
       // Refresh the page to show new data
       setTimeout(() => {
         window.location.reload();

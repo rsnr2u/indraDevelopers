@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Plus, Trash2, GripVertical, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { ImageUpload } from '../../components/ImageUpload';
@@ -28,19 +28,19 @@ export function Menus() {
     }
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
-    const savedMenus = getData('menus');
-    if (savedMenus) {
+  const loadData = async () => {
+    const savedMenus = await getData('menus');
+    if (savedMenus && !Array.isArray(savedMenus)) {
       setMenus({
         ...menus,
         ...savedMenus
       });
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleSave = () => {
     setData('menus', menus);
@@ -290,12 +290,12 @@ export function Menus() {
               {/* Footer Logo & Description */}
               <div className="bg-white rounded-lg border p-6">
                 <h2 className="text-xl mb-6">Footer Logo & Description</h2>
-                
+
                 <div className="space-y-4">
                   <ImageUpload
                     label="Footer Logo"
                     value={menus.footerInfo.logo || ''}
-                    onChange={(value) => updateFooterInfo('logo', value)}
+                    onChange={(value) => updateFooterInfo('logo', value as string)}
                   />
 
                   <div>
@@ -313,23 +313,26 @@ export function Menus() {
               {/* Social Media Links */}
               <div className="bg-white rounded-lg border p-6">
                 <h2 className="text-xl mb-6">Social Media Links</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(socialIcons).map(([platform, Icon]) => (
-                    <div key={platform} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <Icon className="h-5 w-5 text-gray-600" />
+                  {Object.entries(socialIcons).map(([platform, Icon]) => {
+                    const IconComponent = Icon as React.ElementType;
+                    return (
+                      <div key={platform} className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <IconComponent className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <Label className="text-xs capitalize">{platform}</Label>
+                          <Input
+                            value={menus.footerInfo.socialMedia[platform] || ''}
+                            onChange={(e) => updateSocialMedia(platform, e.target.value)}
+                            placeholder={`https://${platform}.com/yourpage`}
+                          />
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <Label className="text-xs capitalize">{platform}</Label>
-                        <Input
-                          value={menus.footerInfo.socialMedia[platform] || ''}
-                          onChange={(e) => updateSocialMedia(platform, e.target.value)}
-                          placeholder={`https://${platform}.com/yourpage`}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

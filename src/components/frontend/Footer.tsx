@@ -12,14 +12,25 @@ export function Footer() {
   const [menus, setMenus] = useState<any[]>([]);
 
   useEffect(() => {
-    const websiteSettings = getData('settings');
-    setSettings(websiteSettings);
-    
-    const cmsPages = getData('cmsPages');
-    setContact(cmsPages?.contact);
-    
-    const menuData = getData('menus');
-    setMenus(menuData?.footer || []);
+    const loadData = async () => {
+      const websiteSettings = await getData('settings');
+      if (websiteSettings && !Array.isArray(websiteSettings)) {
+        // Handle potential nested 'settings' key
+        const actualSettings = websiteSettings.settings || websiteSettings;
+        setSettings(actualSettings);
+      }
+
+      const cmsPages = await getData('cmsPages');
+      if (cmsPages && !Array.isArray(cmsPages)) {
+        setContact(cmsPages.contact);
+      }
+
+      const menuData = await getData('menus');
+      if (menuData && !Array.isArray(menuData)) {
+        setMenus(menuData.footer || []);
+      }
+    };
+    loadData();
   }, []);
 
   if (!settings) return null;
@@ -49,7 +60,7 @@ export function Footer() {
                   e.currentTarget.style.borderColor = '#334155';
                 }}
               />
-              <Button 
+              <Button
                 className="text-white px-6"
                 style={{ backgroundColor: colors.primaryColor }}
                 onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
@@ -76,14 +87,14 @@ export function Footer() {
             <p className="text-slate-400 leading-relaxed mb-6">
               {settings.footer?.text || settings.website.slogan || 'Building dreams, creating landmarks. Your trusted partner in real estate development.'}
             </p>
-            
+
             {/* Social Media */}
             <div className="flex items-center gap-3">
               {settings.social?.facebook && (
-                <a 
+                <a
                   href={settings.social.facebook}
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center transition-all hover:scale-110"
                   style={{ backgroundColor: '#1e293b' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryColor}
@@ -93,10 +104,10 @@ export function Footer() {
                 </a>
               )}
               {settings.social?.twitter && (
-                <a 
+                <a
                   href={settings.social.twitter}
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center transition-all hover:scale-110"
                   style={{ backgroundColor: '#1e293b' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryColor}
@@ -106,10 +117,10 @@ export function Footer() {
                 </a>
               )}
               {settings.social?.linkedin && (
-                <a 
+                <a
                   href={settings.social.linkedin}
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center transition-all hover:scale-110"
                   style={{ backgroundColor: '#1e293b' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryColor}
@@ -119,10 +130,10 @@ export function Footer() {
                 </a>
               )}
               {settings.social?.instagram && (
-                <a 
+                <a
                   href={settings.social.instagram}
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center transition-all hover:scale-110"
                   style={{ backgroundColor: '#1e293b' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryColor}
@@ -163,8 +174,8 @@ export function Footer() {
               <span className="absolute bottom-0 left-0 w-12 h-0.5" style={{ backgroundColor: colors.primaryColor }}></span>
             </h4>
             <div className="flex flex-col gap-3">
-              <Link 
-                to="/projects" 
+              <Link
+                to="/projects"
                 className="text-slate-400 transition-colors flex items-center gap-2 group"
                 onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
@@ -172,8 +183,8 @@ export function Footer() {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 Residential Plots
               </Link>
-              <Link 
-                to="/projects" 
+              <Link
+                to="/projects"
                 className="text-slate-400 transition-colors flex items-center gap-2 group"
                 onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
@@ -181,8 +192,8 @@ export function Footer() {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 Commercial Spaces
               </Link>
-              <Link 
-                to="/projects" 
+              <Link
+                to="/projects"
                 className="text-slate-400 transition-colors flex items-center gap-2 group"
                 onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
@@ -190,8 +201,8 @@ export function Footer() {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 Gated Communities
               </Link>
-              <Link 
-                to="/contact" 
+              <Link
+                to="/contact"
                 className="text-slate-400 transition-colors flex items-center gap-2 group"
                 onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
@@ -225,8 +236,8 @@ export function Footer() {
                   </div>
                   <div>
                     <p className="text-sm mb-1 text-slate-500">Phone Number</p>
-                    <a 
-                      href={`tel:${contact.phone}`} 
+                    <a
+                      href={`tel:${contact.phone}`}
                       className="text-slate-300 transition-colors"
                       onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#cbd5e1'}
@@ -241,8 +252,8 @@ export function Footer() {
                   </div>
                   <div>
                     <p className="text-sm mb-1 text-slate-500">Email Address</p>
-                    <a 
-                      href={`mailto:${contact.email}`} 
+                    <a
+                      href={`mailto:${contact.email}`}
                       className="text-slate-300 transition-colors"
                       onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#cbd5e1'}

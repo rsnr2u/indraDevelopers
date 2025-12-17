@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { getData, setData, addItem, deleteItem } from '../../utils/localStorage';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Shield } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
@@ -20,14 +20,22 @@ export function Users() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 
-  useEffect(() => {
-    loadData();
+  const loadData = useCallback(async () => {
+    try {
+      const usersData = await getData('users');
+      setUsers(Array.isArray(usersData) ? usersData : []);
+
+      const rolesData = await getData('roles');
+      setRoles(Array.isArray(rolesData) ? rolesData : []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Failed to load users and roles');
+    }
   }, []);
 
-  const loadData = () => {
-    setUsers(getData('users') || []);
-    setRoles(getData('roles') || []);
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleSaveUser = () => {
     if (!formData.name || !formData.email || !formData.role) {
@@ -41,7 +49,7 @@ export function Users() {
     }
 
     if (editingItem) {
-      const updated = users.map(user => 
+      const updated = users.map(user =>
         user.id === editingItem.id ? { ...user, ...formData } : user
       );
       setData('users', updated);
@@ -64,7 +72,7 @@ export function Users() {
     }
 
     if (editingItem) {
-      const updated = roles.map(role => 
+      const updated = roles.map(role =>
         role.id === editingItem.id ? { ...role, ...formData } : role
       );
       setData('roles', updated);
@@ -90,7 +98,7 @@ export function Users() {
 
   const allPermissions = [
     'dashboard',
-    'seo', 
+    'seo',
     'cms',
     'settings',
     'projects',

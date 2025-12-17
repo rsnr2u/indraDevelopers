@@ -7,14 +7,14 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { getData, addItem, updateItem } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Calendar, Clock, User, MapPin, Phone, Mail, ArrowLeft } from 'lucide-react';
 
 export function ScheduleVisit() {
   const navigate = useNavigate();
   const location = useLocation();
   const editingVisit = location.state?.visit;
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,36 +28,42 @@ export function ScheduleVisit() {
     status: 'Scheduled',
     assignedTo: ''
   });
-  
+
   const [projects, setProjects] = useState<any[]>([]);
   const [nameSearch, setNameSearch] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
   useEffect(() => {
-    const projectsData = getData('projects') || [];
-    setProjects(projectsData.filter((p: any) => p.status === 'Active'));
-    
-    if (editingVisit) {
-      setFormData(editingVisit);
-      setNameSearch(editingVisit.name);
-    }
+    const loadProjects = async () => {
+      const projectsData = await getData('projects') || [];
+      setProjects((Array.isArray(projectsData) ? projectsData : []).filter((p: any) => p.status === 'Active'));
+
+      if (editingVisit) {
+        setFormData(editingVisit);
+        setNameSearch(editingVisit.name);
+      }
+    };
+    loadProjects();
   }, []);
 
   useEffect(() => {
-    if (nameSearch.length >= 2) {
-      const leads = getData('leads') || [];
-      const results = leads.filter((lead: any) =>
-        (lead.name?.toLowerCase() || '').includes(nameSearch.toLowerCase()) ||
-        (lead.email?.toLowerCase() || '').includes(nameSearch.toLowerCase()) ||
-        (lead.phone || '').includes(nameSearch)
-      );
-      setSearchResults(results);
-      setShowSearchResults(true);
-    } else {
-      setSearchResults([]);
-      setShowSearchResults(false);
-    }
+    const searchLeads = async () => {
+      if (nameSearch.length >= 2) {
+        const leads = await getData('leads') || [];
+        const results = (Array.isArray(leads) ? leads : []).filter((lead: any) =>
+          (lead.name?.toLowerCase() || '').includes(nameSearch.toLowerCase()) ||
+          (lead.email?.toLowerCase() || '').includes(nameSearch.toLowerCase()) ||
+          (lead.phone || '').includes(nameSearch)
+        );
+        setSearchResults(results);
+        setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    };
+    searchLeads();
   }, [nameSearch]);
 
   const handleLeadSelect = (lead: any) => {
@@ -133,7 +139,7 @@ export function ScheduleVisit() {
                 <User className="h-5 w-5" />
                 Customer Information
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2 relative">
                   <Label htmlFor="nameSearch">Search Customer Name / Email / Phone *</Label>
@@ -146,7 +152,7 @@ export function ScheduleVisit() {
                     }}
                     placeholder="Start typing to search from existing leads..."
                   />
-                  
+
                   {showSearchResults && searchResults.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                       {searchResults.map((lead) => (
@@ -175,7 +181,7 @@ export function ScheduleVisit() {
                       ))}
                     </div>
                   )}
-                  
+
                   <p className="text-xs text-slate-500 mt-1">
                     Search from existing leads or enter new customer details
                   </p>
@@ -210,7 +216,7 @@ export function ScheduleVisit() {
                 <Calendar className="h-5 w-5" />
                 Visit Details
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <Label htmlFor="project">Select Project *</Label>

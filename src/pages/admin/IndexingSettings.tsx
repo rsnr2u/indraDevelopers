@@ -4,7 +4,7 @@ import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { getData, setData } from '../../utils/localStorage';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Search, Globe, CheckCircle, XCircle, Send } from 'lucide-react';
 
 export function IndexingSettings() {
@@ -13,26 +13,9 @@ export function IndexingSettings() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPages, setSelectedPages] = useState<string[]>([]);
 
-  useEffect(() => {
-    loadPages();
-  }, []);
+  const loadPages = async () => {
+    const customPages = await getData('customPages') || [];
 
-  useEffect(() => {
-    if (searchTerm) {
-      setFilteredPages(
-        pages.filter(page => 
-          page.pageTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          page.slug.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredPages(pages);
-    }
-  }, [searchTerm, pages]);
-
-  const loadPages = () => {
-    const customPages = getData('customPages') || [];
-    
     // Default system pages
     const systemPages = [
       { id: 'home', pageName: 'Home Page', pageTitle: 'Home', slug: '', seo: { index: true }, status: 'Published', isSystem: true },
@@ -43,10 +26,29 @@ export function IndexingSettings() {
       { id: 'gallery', pageName: 'Gallery Page', pageTitle: 'Gallery', slug: 'gallery', seo: { index: true }, status: 'Published', isSystem: true },
     ];
 
-    const allPages = [...systemPages, ...customPages];
+    const allPages = [...systemPages, ...(Array.isArray(customPages) ? customPages : [])];
     setPages(allPages);
     setFilteredPages(allPages);
   };
+
+  useEffect(() => {
+    loadPages();
+  }, []);
+
+  useEffect(() => {
+    if (searchTerm) {
+      setFilteredPages(
+        pages.filter(page =>
+          page.pageTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          page.slug.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredPages(pages);
+    }
+  }, [searchTerm, pages]);
+
+
 
   const togglePageSelection = (pageId: string) => {
     if (selectedPages.includes(pageId)) {
@@ -64,9 +66,9 @@ export function IndexingSettings() {
     }
   };
 
-  const toggleIndexStatus = (pageId: string, currentStatus: boolean) => {
-    const customPages = getData('customPages') || [];
-    const updated = customPages.map((p: any) => {
+  const toggleIndexStatus = async (pageId: string, currentStatus: boolean) => {
+    const customPages = await getData('customPages') || [];
+    const updated = (Array.isArray(customPages) ? customPages : []).map((p: any) => {
       if (p.id === pageId) {
         return {
           ...p,
@@ -93,7 +95,7 @@ export function IndexingSettings() {
     toast.success(`${selectedPages.length} page(s) submitted to search engines for indexing!`, {
       description: 'This is a simulation. In production, this would submit to Google Search Console, Bing Webmaster Tools, etc.'
     });
-    
+
     setSelectedPages([]);
   };
 
@@ -123,7 +125,7 @@ export function IndexingSettings() {
             </div>
             <p className="text-2xl">{stats.total}</p>
           </Card>
-          
+
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -131,7 +133,7 @@ export function IndexingSettings() {
             </div>
             <p className="text-2xl text-green-600">{stats.indexed}</p>
           </Card>
-          
+
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <XCircle className="h-4 w-4 text-red-600" />
@@ -139,7 +141,7 @@ export function IndexingSettings() {
             </div>
             <p className="text-2xl text-red-600">{stats.notIndexed}</p>
           </Card>
-          
+
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Globe className="h-4 w-4 text-purple-600" />
@@ -161,7 +163,7 @@ export function IndexingSettings() {
                 className="pl-10"
               />
             </div>
-            
+
             <Button
               onClick={handleBulkSubmit}
               disabled={selectedPages.length === 0}
@@ -198,7 +200,7 @@ export function IndexingSettings() {
                 {filteredPages.map((page) => {
                   const isIndexed = page.seo?.index !== false;
                   const url = page.slug ? `/${page.slug}` : '/';
-                  
+
                   return (
                     <tr key={page.id} className="border-b hover:bg-slate-50">
                       <td className="p-4">
@@ -231,11 +233,10 @@ export function IndexingSettings() {
                         </a>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          page.status === 'Published'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}>
+                        <span className={`px-2 py-1 rounded text-xs ${page.status === 'Published'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-yellow-100 text-yellow-700'
+                          }`}>
                           {page.status}
                         </span>
                       </td>
@@ -273,7 +274,7 @@ export function IndexingSettings() {
               </tbody>
             </table>
           </div>
-          
+
           {filteredPages.length === 0 && (
             <div className="p-12 text-center text-slate-500">
               {searchTerm ? 'No pages found matching your search' : 'No pages available'}
