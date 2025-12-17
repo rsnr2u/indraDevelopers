@@ -23,7 +23,7 @@ import { LeadDetail } from './pages/admin/LeadDetail';
 import { RoleManagement } from './pages/admin/RoleManagement';
 import { RoleEditor } from './pages/admin/RoleEditor';
 import { GalleryManagement } from './pages/admin/GalleryManagement';
-import { GalleryForm } from './pages/admin/GalleryForm';
+import { GalleryFormPage } from './pages/admin/GalleryForm';
 import { WhatsAppWidget } from './pages/admin/WhatsAppWidget';
 import { Testimonials } from './pages/admin/Testimonials';
 import { EmailTemplates } from './pages/admin/EmailTemplates';
@@ -62,7 +62,7 @@ function App() {
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/track-lead" element={<TrackLead />} />
-          
+
           <Route path="/admin/login" element={<Login />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/seo" element={<SEO />} />
@@ -87,8 +87,8 @@ function App() {
           <Route path="/admin/roles/:id" element={<RoleEditor />} />
           <Route path="/admin/roles/:id/edit" element={<RoleEditor />} />
           <Route path="/admin/gallery" element={<GalleryManagement />} />
-          <Route path="/admin/gallery/new" element={<GalleryForm />} />
-          <Route path="/admin/gallery/:id" element={<GalleryForm />} />
+          <Route path="/admin/gallery/new" element={<GalleryFormPage />} />
+          <Route path="/admin/gallery/:id" element={<GalleryFormPage />} />
           <Route path="/admin/whatsapp-widget" element={<WhatsAppWidget />} />
           <Route path="/admin/testimonials" element={<Testimonials />} />
           <Route path="/admin/email-templates" element={<EmailTemplates />} />
@@ -97,7 +97,7 @@ function App() {
           <Route path="/admin/analytics" element={<Analytics />} />
           <Route path="/admin/exit-intent-settings" element={<ExitIntentSettings />} />
           <Route path="/admin/indexing-settings" element={<IndexingSettings />} />
-          
+
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
