@@ -3,7 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\Filters as BaseFilters;
-use App\Filters\Cors;
+use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
 use CodeIgniter\Filters\ForceHTTPS;

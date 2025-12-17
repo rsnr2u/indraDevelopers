@@ -28,7 +28,7 @@ class Auth extends ResourceController
             ->get()
             ->getRowArray();
 
-        if ($user && $user['password'] === $password) { // In a real app, use password_verify
+        if ($user && password_verify($password, $user['password'])) {
             // Remove password from response
             unset($user['password']);
 

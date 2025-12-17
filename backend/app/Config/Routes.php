@@ -7,6 +7,12 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+$routes->options('(:any)', static function () {
+    $response = service('response');
+    $response->setStatusCode(200);
+    return $response;
+});
+
 $routes->group('api', ['namespace' => 'App\\Controllers\\Api'], function ($routes) {
     $routes->resource('projects');
     $routes->resource('leads');
