@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+backend/vendor/
+
+# Environment
+.env
+backend/.env
+backend/.env.test
+.DS_Store
+
+# Build
+dist/
+build/
+backend/writable/
+!backend/writable/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+npm-debug.log
+yarn-debug.log
+backend/writable/logs/
+
+# OS
+Thumbs.db
